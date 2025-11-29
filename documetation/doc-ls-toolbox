@@ -1,1 +1,37 @@
+Rôle du script 
+
+ls-toolbox.sh
+
+Vérification de l’environnement
+
+        Vérifie que le dossier .sh-toolbox existe. → Sinon, affiche une erreur et sort avec le code 1.
+
+        Vérifie que le fichier archives existe dans ce dossier. → Sinon, affiche une erreur et sort avec le code 2.
+
+Lecture du fichier archives
+
+        Ignore la première ligne (le compteur).
+
+        Parcourt chaque ligne pour afficher :
+
+            le nom de l’archive,
+
+            la date d’ajout,
+
+            si la clé est connue ou non (champ vide → "clé inconnue", sinon → "clé connue").
+
+Contrôles bonus de cohérence
+
+        Vérifie que chaque archive mentionnée dans le fichier archives existe réellement dans le dossier .sh-toolbox. → Si une ar>
+
+        Vérifie que chaque archive présente physiquement dans .sh-toolbox est bien mentionnée dans le fichier archives. → Si une >
+
+Codes de retour utilisés
+
+        0 → liste affichée sans erreur.
+
+        1 → dossier .sh-toolbox manquant.
+
+        2 → fichier archives manquant.
+
 
