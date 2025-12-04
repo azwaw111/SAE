@@ -3,11 +3,10 @@ CFLAGS = -Wall -Wextra
 
 PROG = cipher decipher findkey
 
-
+# Cible par défaut : tout compiler
+all: libcrypto.a $(PROG)
 
 # Bibliothèque
-
-
 libcrypto.a: crypto.o
 	ar rcs libcrypto.a crypto.o
 
@@ -26,10 +25,6 @@ findkey: findkey.o libcrypto.a
 %.o: %.c crypto.h
 	$(CC) $(CFLAGS) -c $<
 
-
-
 # Nettoyage
-
 clean:
-	rm -f *.o libcrypto.a
-	rm $(PROG)
+	rm -f *.o libcrypto.a $(PROG)
