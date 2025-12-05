@@ -1,45 +1,37 @@
-# 📚 Toolbox SAE - Audit et Gestion Forensique d'Archives 
+          **Partie Bash**
+          **Compétence C3**
 
 ## 📝 Description Générale du Projet
 
-Ce projet est une **boîte à outils (Toolbox) de scripts Bash** conçue spécifiquement pour la gestion centralisée et l'audit forensique d'archives `.tar.gz` reçues après un incident de sécurité.
-
-> **ℹ️ Contexte Scolaire (SAE) :** Ce projet a été conçu dans le cadre d'une Situation d'Apprentissage et d'Évaluation (SAE) pour les étudiants. Son but principal est **d'apprendre et de mettre en pratique** les concepts de l'analyse forensique, de la gestion de fichiers, de l'indexation de données et de l'automatisation via des scripts Shell robustes.
-
-Elle fournit des outils pour organiser les preuves (archives) et effectuer des analyses rapides basées sur la corrélation entre les logs de connexion et les *timestamps* des fichiers.
+Ce projet met en place une boîte à ouils Bash permettant de gérer des archives .tar.gz issues d’un environnement compromis. Les scripts permettent de :
+    Initialiser l’environnement de travail
+    Importer et gérer des archives
+    Lister et restaurer l’environnement
+    Analyser les archives pour identifier les fichiers impactés
+    
+> **ℹ️ Contexte Scolaire (SAE) :** Ce projet a été conçu dans le cadre d'une Situation d'Apprentissage et d'Évaluation (SAE) pour les étudiants. Son but principal est **d'apprendre et de mettre en pratique** les concepts de l'analyse après attaque, de la gestion de fichiers.
 
 -----
 
 ## 🟢 Statut du Projet et Technologies
+#Statut 
+En développement
 
-### Statut
+### Pré-requis et Technologies Utilisées
 
-**Développement Terminé (Version 1.0 - Prêt pour l'analyse)**.
-
-### Technologies Utilisées
-
-Ce projet est entièrement basé sur des scripts **Bash**, utilisant des utilitaires standards des systèmes **GNU/Linux** et **macOS** (tels que `grep`, `awk`, `sed`, `date`, `tar`, `stat`).
-
+Ce projet est entièrement basé sur des scripts **Bash**, utilisant des utilitaires standards des systèmes **Linux** (tels que `grep`, `awk`, `sed`, `date`, `tar`, `stat`).
+Les scripts doivent être placés dans le dossier de travail de la SAE.
 -----
 
-## ⚙️ Exigences concernant l’environnement
-
-Pour l'intégration et l'exécution, vous devez disposer :
-
-  * D'un environnement **GNU/Linux** ou **macOS**.
-  * De l'interpréteur **Bash**.
-  * Des outils de base **GNU Core Utilities** pour garantir la bonne exécution des commandes complexes de gestion de date (`date -d`) et de fichiers.
-
------
-
-## 🔑 Concepts Fondamentaux
+##  Concepts Fondamentaux
 
 La Toolbox utilise un environnement caché et auto-géré dans le répertoire d'exécution :
 
   * **Dossier de Stockage :** `.sh-toolbox`
-      * Le dépôt centralisé des archives à analyser.
+      * contient toutes les archives importées
   * **Fichier d'Index :** `.sh-toolbox/archives`
-      * Index des preuves. La première ligne est un **compteur** ; les lignes suivantes sont au format `nom_archive:date_ajout:clé`.
+      * Index des preuves. La première ligne est un **compteur** ;
+      * les lignes suivantes sont au format       `nom_archive:date_ajout:clé`.
 
 -----
 
@@ -57,12 +49,12 @@ Exécutez cette commande une seule fois pour créer la structure de la Toolbox :
 
 | Nom du Script | Objectif | Syntaxe | Rôle dans l'Audit |
 | :--- | :--- | :--- | :--- |
-| **`init-toolbox.sh`** | Crée le dossier `.sh-toolbox` et l'index `archives`. | `./init-toolbox.sh` | **Préparation** |
-| **`import-archive.sh`** | Importe **une seule** archive de preuve. | `./import-archive.sh <chemin/archive.tar.gz>` | **Stockage de Preuve** |
-| **`importe-archive2.sh`** | Importe **plusieurs** archives. | `./importe-archive2.sh [-f] <arch1> [arch2] ...` | **Stockage en Vrac** |
-| **`ls-toolbox.sh`** | Affiche l'inventaire et vérifie l'intégrité de l'index. | `./ls-toolbox.sh` | **Vérification de Cohérence** |
-| **`restore-toolbox.sh`** | **Restauration Interactive** : Répare les incohérences entre les fichiers et l'index. | `./restore-toolbox.sh` | **Intégrité de la Chaîne de Preuve** |
-| **`check-archive.sh`** | **Audit Forensique Principal** : Analyse les logs d'une archive pour identifier les fichiers modifiés après la dernière connexion `admin`. | `./check-archive.sh` | **Analyse d'Impact** |
+| **`init-toolbox.sh`** | Initialise l’environnement .sh-toolbox et crée le fichier archives | `./init-toolbox.sh` | **Préparation** |
+| **`import-archive.sh`** | Importe une archive (simple, une à la fois, avec confirmation)I | `./import-archive.sh <cheminarchive.tar.gz>` | **Stockage de Preuve** |
+| **`importe-archive2.sh`** | Version améliorée : mode force (-f) et importation multiple  | `./importe-archive2.sh [-f] <arch1> [arch2] ...` | **Stockage en Vrac** |
+| **`ls-toolbox.sh`** | Diagnostic (liste + détection incohérences) | `./ls-toolbox.sh` | **Vérification de Cohérence** |
+| **`restore-toolbox.sh`** | Réparation (corrige incohérences, met à jour compteur) | `./restore-toolbox.sh` | **Intégrité de la Chaîne de Preuve** |
+| **`check-archive.sh`** | Analyse des archives pour identifier fichiers modifiés/non modifiés | `./check-archive.sh` | **Analyse d'Impact** |
 
 ### Focus : Le Script d'Audit (`check-archive.sh`)
 
@@ -78,7 +70,7 @@ Ce script est au cœur de l'analyse post-attaque. Il utilise les **timestamps (M
 
 -----
 
-## 🐛 Bugs Connus et FAQ
+##  Bugs Connus et FAQ
 
 ### Bugs Connus
 
@@ -107,6 +99,6 @@ Veuillez ouvrir une **Issue** pour discuter de tout bogue ou fonctionnalité ava
 
 ## ⚖️ Droits d’Auteurs et Licence
 
-**Auteur :** [Votre Nom ou celui de l'Équipe SAE]
+**Auteur :** zerrouak , Aziz
 **Année :** [Année de la SAE]
 **Licence :** Ce projet est distribué sous la licence **[À Compléter : ex. MIT, GPLv3]**.
