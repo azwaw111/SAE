@@ -1,45 +1,83 @@
-Liste des archives importées:
 #!/bin/bash
 
-# Vérifier si le dossier .sh-toolbox existe
+# Vérifier qu'au moins un paramètre est passé
+if [ $# -lt 1 ]; then
+    echo "Erreur : vous n'avez pas passé de paramètres"
+    exit 2
+fi
+
+# Vérifier que le dossier .sh-toolbox existe
 if [ ! -d ".sh-toolbox" ]; then
     echo "Erreur : le dossier .sh-toolbox n'existe pas"
     exit 1
 fi
 
-# Vérifier si le fichier archives existe
-if [ ! -f ".sh-toolbox/archives" ]; then
-    echo "Erreur : le fichier archives n'existe pas"
+# Mode force ?
+force=0
+if [ "$1" = "-f" ]; then
+    force=1
+    shift  # enlevé -f des paramètres
+fi
+
+# Vérifier qu'il reste au moins une archive
+if [ $# -lt 1 ]; then
+    echo "Erreur : aucune archive à importer"
     exit 2
 fi
 
-# Parcourir le fichier archives (ignorer la première ligne = compteur)
-while IFS=: read -r archive_name date key; do
-    [ -z "$archive_name" ] && continue
+ARCHIVES=".sh-toolbox/archives"
+if [ ! -f "$ARCHIVES" ]; then
+    echo "0" > "$ARCHIVES"
+fi
 
-    if [ -z "$key" ]; then
-        cle="clé inconnue"
-    else 
-        cle="clé connue"
-    fi 
+# Lire le compteur actuel
+count=$(head -n 1 "$ARCHIVES")
 
-    echo "Archive : $archive_name | Date : $date | $cle"
-
-    # BONUS : vérifier si archive mentionnée existe réellement
-    if [ ! -f ".sh-toolbox/$archive_name" ] ; then
-        echo "Erreur : l'archive $archive_name est mentionnée mais absente"
-        exit 3
+# Boucle sur toutes les archives passées en paramètre
+for archive in "$@"; do
+    # Vérifier que l'archive existe
+    if [ ! -f "$archive" ]; then
+        echo "Erreur : L'archive $archive n'existe pas"
+        continue
     fi
-done < <(tail -n +2 ".sh-toolbox/archives")
 
-# BONUS : vérifier si une archive existe mais n'est pas mentionnée
-for fichier in .sh-toolbox/*.tar.gz; do
-    [ -e "$fichier" ] || continue
-    archive_name=$(basename "$fichier")
-    if ! grep -q "^$archive_name:" ".sh-toolbox/archives"; then 
-        echo "Avertissement : l'archive $archive_name est présente mais non mentionnée"
-        exit 3
+    nom_archive=$(basename "$archive")
+
+    # Vérifier si un fichier du même nom existe déjà
+    if [ -f ".sh-toolbox/$nom_archive" ]; then
+        if [ $force -eq 1 ]; then
+            cp "$archive" ".sh-toolbox/$nom_archive"
+            echo "Le fichier $nom_archive a été écrasé (mode force)."
+        else
+            echo "Le fichier $nom_archive existe déjà."
+            read -p "Voulez-vous écraser le fichier ? y/n " reponse
+            if [ "$reponse" = "y" ]; then
+                cp "$archive" ".sh-toolbox/$nom_archive"
+                echo "Le fichier $nom_archive a été écrasé."
+            else
+                echo "Copie annulée pour $nom_archive."
+                continue
+            fi
+        fi
+    else
+        cp "$archive" ".sh-toolbox/$nom_archive"
+        echo "Archive $nom_archive copiée avec succès."
     fi
+
+    # Mise à jour du fichier archives
+    count=$((count+1))
+    date=$(date +"%Y%m%d-%H%M%S")
+    {
+        echo "$count"
+        tail -n +2 "$ARCHIVES"
+        echo "$nom_archive:$date:"
+    } > "$ARCHIVES.tmp" && mv "$ARCHIVES.tmp" "$ARCHIVES"
+
+    if [ $? -ne 0 ]; then
+        echo "Erreur : problème lors de la mise à jour du fichier archives"
+        exit 4
+    fi
+    echo "Le fichier archives a été mis à jour pour $nom_archive."
 done
 
 exit 0
