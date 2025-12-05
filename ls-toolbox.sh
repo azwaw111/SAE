@@ -1,5 +1,4 @@
 
-Liste des archives importées:
 #!/bin/bash
 
 # Vérifier si le dossier .sh-toolbox existe
