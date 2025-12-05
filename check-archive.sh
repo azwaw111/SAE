@@ -1,12 +1,12 @@
 #!/bin/bash
-# Vérifications
+#0 Vérifications
 # Vérifier si le dossier .sh-toolbox existe
 if [ ! -d ".sh-toolbox" ]; then
   echo "Erreur: dossier .sh-toolbox manquant"
   exit 1
 fi
 # Vérifier si le fichier archives existe
-if [ ! -f "archives" ]; then
+if [ ! -f ".sh-toolbox/archives" ]; then
   echo "Erreur: fichier archives manquant"
   exit 2
 fi
@@ -14,7 +14,7 @@ fi
 
 #1. Proposer la liste des archives disponibles
 echo "Archives disponibles :"
-ls .sh-toolbox/archive
+ls .sh-toolbox
 read -p "Sélectionnez une archive : " archive
 
 if [ ! -f ".sh-toolbox/$archive" ]; then
@@ -105,7 +105,7 @@ for file in /tmp/toolbox-check/data/*; do
         filesize=$(stat -c %s "$file")
 
         # Chercher les fichiers non modifiés avec même nom et taille
-        for other in /tmp/toolbox-check/dataa/*; do
+        for other in /tmp/toolbox-check/data/*; do
             other_timestamp=$(date -r "$other" +%s)
             other_name=$(basename "$other")
             other_size=$(stat -c %s "$other")
@@ -118,6 +118,7 @@ for file in /tmp/toolbox-check/data/*; do
         done
     fi
 done
+
 
 
 
