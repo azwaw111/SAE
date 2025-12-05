@@ -1,0 +1,103 @@
+# Partie Bash – Compétence C3
+
+## Description générale du projet
+
+Ce projet met en place une boîte à outils Bash permettant de gérer des archives au format `.tar.gz` issues d’un environnement compromis. Les scripts développés permettent de :
+
+- Initialiser l’environnement de travail  
+- Importer et gérer des archives  
+- Lister et restaurer l’environnement  
+- Analyser les archives pour identifier les fichiers impactés  
+
+Ce projet a été conçu dans le cadre d’une Situation d’Apprentissage et d’Évaluation (SAE). L’objectif est d’apprendre et de mettre en pratique les concepts liés à l’analyse post-attaque et à la gestion de fichiers.
+
+
+## Statut du projet et technologies utilisées
+
+**Statut :** En développement
+
+**Technologies :**  
+Le projet repose exclusivement sur des scripts Bash et utilise des utilitaires standards des systèmes Linux (`grep`, `awk`, `sed`, `date`, `tar`, `stat`).  
+Les scripts doivent être placés dans le dossier de travail de la SAE.
+
+## Concepts fondamentaux
+
+La Toolbox repose sur une structure cachée et auto-gérée dans le répertoire d’exécution :
+
+- **Dossier de stockage :** `.sh-toolbox`  
+  Contient toutes les archives importées.  
+
+- **Fichier d’index :** `.sh-toolbox/archives`  
+  Sert de registre des preuves. La première ligne est un compteur, les lignes suivantes sont au format :  
+  ```
+  nom_archive:date_ajout:clé
+  ```
+
+---
+
+## Instructions pour l’installation et l’utilisation
+
+### 1. Initialisation de l’environnement
+
+Exécuter la commande suivante une seule fois pour créer la structure de la Toolbox :
+
+```bash
+./init-toolbox.sh
+```
+
+### 2. Guide des scripts
+
+| Nom du script          | Objectif                                               | Syntaxe                                      | Rôle dans l’audit                  |
+|------------------------|--------------------------------------------------------|----------------------------------------------|------------------------------------|
+| `init-toolbox.sh`      | Initialise l’environnement `.sh-toolbox` et crée le fichier `archives` | `./init-toolbox.sh`                          | Préparation                        |
+| `import-archive.sh`    | Importe une archive (une seule à la fois, avec confirmation) | `./import-archive.sh <chemin/archive.tar.gz>` | Stockage de preuve                 |
+| `import-archive2.sh`   | Version améliorée : mode force (-f) et importation multiple | `./import-archive2.sh [-f] <arch1> [arch2]...` | Stockage en vrac                   |
+| `ls-toolbox.sh`        | Diagnostic : liste les archives et détecte les incohérences | `./ls-toolbox.sh`                            | Vérification de cohérence          |
+| `restore-toolbox.sh`   | Répare les incohérences et met à jour le compteur       | `./restore-toolbox.sh`                       | Intégrité de la chaîne de preuve   |
+| `check-archive.sh`     | Analyse les archives pour identifier fichiers modifiés/non modifiés | `./check-archive.sh`                         | Analyse d’impact                   |
+
+---
+
+## Focus : le script d’audit `check-archive.sh`
+
+Ce script est central dans l’analyse post-attaque. Il utilise les dates de modification des fichiers (Mtime) pour déterminer ceux qui ont été modifiés par l’attaquant.
+
+**Étapes de l’audit :**
+
+1. Propose une liste des archives disponibles dans la Toolbox.  
+2. Décompresse l’archive sélectionnée dans un répertoire temporaire.  
+3. Analyse le fichier de logs (`var/log/auth.log`) pour trouver l’heure de la dernière connexion réussie de l’utilisateur `admin`.  
+4. Compare ce temps de connexion avec les dates de modification des fichiers présents dans le dossier `data`.  
+5. Affiche la liste des fichiers modifiés après cette connexion (fichiers potentiellement impactés).  
+6. [Bonus] Identifie les fichiers non modifiés qui portent le même nom et ont la même taille que les fichiers modifiés (considérés comme intacts).
+
+---
+
+## Bugs connus et FAQ
+
+### Bugs connus
+
+- **Gestion de l’année :** Le script `check-archive.sh` utilise l’année courante pour contextualiser la date de connexion des logs. Si les logs proviennent d’une archive ancienne, cela peut fausser l’analyse.  
+- **Format des archives :** L’outil est limité aux archives au format `.tar.gz`.
+
+### FAQ
+
+**Q : Que se passe-t-il si j’oublie d’utiliser `init-toolbox.sh` ?**  
+R : Les autres scripts renverront une erreur avec le code de retour `1` ou `2`, car ils dépendent de l’existence du dossier `.sh-toolbox` et du fichier `archives`. Utilisez `restore-toolbox.sh` pour recréer la structure.  
+
+**Q : Comment résoudre un conflit lors de l’importation ?**  
+R : Si un fichier existe déjà, utilisez l’option `-f` avec `import-archive2.sh` pour forcer l’écrasement.  
+
+---
+
+## Droits d’auteur et licence
+
+**Auteur :** Zerrouak Aziz  
+**Année :** [Année de la SAE]  
+**Licence :** Projet distribué sous licence universitaire (usage pédagogique).  
+
+---
+
+Voilà, cette version est plus académique et correspond exactement à ce que ton professeur attend : un guide clair, structuré, qui explique comment utiliser tes scripts sans réécrire le sujet.  
+
+Veux-tu que je t’aide à rédiger aussi une **introduction courte** (style résumé en 5 lignes) que tu pourrais mettre en tout début de ton rendu, comme une présentation générale ?
