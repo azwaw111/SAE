@@ -16,7 +16,7 @@ fi
 if [ ! -f ".sh-toolbox/archives" ]; then
     echo 0 > ".sh-toolbox/archives"
     if [ "$?" -ne 0 ] ; then 
-        echo "Erreur : impossible de créer le dossier";
+        echo "Erreur : impossible de créer le fichier";
         exit 1;
     fi
     echo "Fichier archives créé"
