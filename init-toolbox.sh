@@ -3,7 +3,7 @@
 # Vérifier si le dossier existe
 if [ ! -d ".sh-toolbox" ]; then
     mkdir ".sh-toolbox" 
-    if [ "$?" -eq 0 ] ; then 
+    if [ "$?" -ne 0 ] ; then 
         echo "Erreur : impossible de créer le dossier";
         exit 1;
     fi
@@ -15,7 +15,7 @@ fi
 # Vérifier si le fichier existe
 if [ ! -f ".sh-toolbox/archives" ]; then
     echo 0 > ".sh-toolbox/archives"
-    if [ "$?" -eq 0 ] ; then 
+    if [ "$?" -ne 0 ] ; then 
         echo "Erreur : impossible de créer le dossier";
         exit 1;
     fi
