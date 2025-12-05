@@ -13,9 +13,8 @@ if [ ! -f ".sh-toolbox/archives" ]; then
     echo 0 > ".sh-toolbox/archives" || { echo "Erreur : impossible de créer le fichier"; exit 1; }
     echo "Fichier archives créé"
 else
-echo "Le fichier archives existe déjà"
+    echo "Le fichier archives existe déjà"
 fi
-
 # Vérifier que le dossier contient uniquement archives
 contenu=$(ls -A .sh-toolbox)
 if [ "$contenu" != "archives" ]; then
