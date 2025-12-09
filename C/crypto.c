@@ -1,5 +1,4 @@
 #include "crypto.h"
-#include "crypto.h"
 
 
 int indice_base64(char caractere) {
