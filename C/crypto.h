@@ -9,5 +9,7 @@
 #define ALPHABET "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
 int indice_base64(char caractere); 
+void vigenereEnc(const char *entree, const char *cle, char *sortie);
+void vigenereDec(const char *entree, const char *cle, char *sortie);
 
 #endif
