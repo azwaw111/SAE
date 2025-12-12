@@ -13,7 +13,7 @@ Supposons `exemple.txt` :
 
 base64 exemple.txt > exemple.b64
 echo -n "CleSAE2025" | base64
-./cipher "<clé encodée en base64>" exemple.b64
+./cipher "Q2xlU0FFMjAyNQ==" exemple.b64
 base64 -d exemple.b64 > output.bin
 
 
@@ -27,7 +27,7 @@ Supposons `exemple2.jpg` :
 
 
 base64 exemple2.jpg > image.b64
-./cipher "<clé encodée en base64>" image.b64
+./cipher "Q2xlU0FFMjAyNQ==" image.b64
 base64 -d image.b64 > image_chiffree.bin
 
 
@@ -35,7 +35,7 @@ Le processus est identique pour tout type de fichier.
 
 
 
-## Exemple rapide
+## Exemple:
 
 
 base64 exemple2.jpg > exemple.b
@@ -53,7 +53,7 @@ base64 exemple2.jpg > exemple.b
 
 
 echo -n "CleSAE2025" | base64
-./decipher "<clé encodée en base64>" exemple.b64
+./decipher "Q2xlU0FFMjAyNQ==" exemple.b64
 base64 -d exemple.b64 > output.txt
 
 Nous recommandons d’utiliser `cat` pour afficher le contenu des fichiers générés.
@@ -183,9 +183,9 @@ K' = (64 - K) mod 64
 1. Lecture simultanée des deux fichiers.
 2. Calcul du décalage pour chaque caractère :
 
-```
+
 diff = (C - P + 64) mod 64
-```
+
 
 3. Détermination de la période de la clé.
 4. Affichage :
@@ -232,10 +232,3 @@ Ce document regroupe toutes les informations nécessaires à l’utilisation et 
 ## Description
 
 Projet réalisé à but éducatif dans le cadre de la SAE.
-
-
-
-## Remarque
-
-Nous recommandons fortement d’utiliser `cat` pour afficher le contenu généré par les commandes (`clair.b64`, `image.b64`, fichiers décodés, etc.).
-
