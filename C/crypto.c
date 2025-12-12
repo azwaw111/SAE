@@ -8,7 +8,7 @@ int indice_base64(char c) {
 
 void vigenereEnc(const char *entree, const char *cle_base64, char *sortie)
 {
-    // 1️⃣ Nettoyer la clé : enlever tous les '=' de fin
+    // 1 Nettoyer la clé : enlever tous les '=' de fin
     int len_cle = strlen(cle_base64); // savoir la longueur de la clé 
     while (len_cle > 0 && cle_base64[len_cle - 1] == '=') {
         len_cle--; // mise de la taile de la clé 
@@ -24,13 +24,13 @@ void vigenereEnc(const char *entree, const char *cle_base64, char *sortie)
     for (int i = 0; entree[i] != '\0'; i++) {
         if (entree[i] == '\n' || entree[i] == '\r'|| entree[i]=='\t') continue;
         
-        // 2️⃣ Si caractère '=' dans le fichier, on le recopie
+        // 2 Si caractère '=' dans le fichier, on le recopie
         if (entree[i] == '=') {
             sortie[k++] = '=';
             continue;
         }
 
-        // 3️⃣ Indices Base64
+        // 3 Indices Base64
         int indice_clair = indice_base64(entree[i]);
         if (indice_clair < 0) { // sécurité
             sortie[k++] = entree[i];
@@ -42,11 +42,11 @@ void vigenereEnc(const char *entree, const char *cle_base64, char *sortie)
             idx_key = 0;
         }
 
-        // 4️⃣ Application de Vigenère mod 64
+        // 4 Application de Vigenère mod 64
         int indice_chiffre = (indice_clair + idx_key) % 64;
         sortie[k++] = ALPHABET[indice_chiffre];
 
-        // 5️⃣ Avancer l'indice de clé
+        // 5 vancer l'indice de clé
         iCle = (iCle + 1) % len_cle;
     }
 
