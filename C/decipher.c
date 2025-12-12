@@ -1,39 +1,39 @@
 #include "crypto.h"
 
-
-
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     if (argc != 3) {
-        fprintf(stderr, "Utilisation : %s <cle> <fichier_entree_base64>\n", argv[0]);
+        fprintf(stderr, "Utilisation : %s <cle_base64> <fichier_base64>\n", argv[0]);
         return 1;
     }
 
-    char *cle = argv[1];
-    int longueur_cle = strlen(cle);
+    const char *cle = argv[1];
+    const char *fichier = argv[2];
 
-    FILE *fichier_entree = fopen(argv[2], "r");
-    if (!fichier_entree) {
-        perror("Erreur ouverture fichier");
-        return 1;
-    }
+    FILE *f = fopen(fichier, "r");
+    if (!f) { perror("Erreur ouverture"); return 1; }
 
-    int caractere, indice_cle = 0;
-    while ((caractere = fgetc(fichier_entree)) != EOF) {
-        if (caractere == '=') {
-            putchar(caractere);
-            continue;
-        }
-        int indice_chiffre = indice_base64((char)caractere);
-        if (indice_chiffre < 0) continue;
+    fseek(f, 0, SEEK_END);
+    long taille = ftell(f);
+    rewind(f);
 
-        int indice_cle_val = indice_base64(cle[indice_cle]);
-        int indice_plain = (indice_chiffre - indice_cle_val + 64) % 64;
+    char *entree = malloc(taille + 1);
+    char *sortie = malloc(taille + 1);
 
-        putchar(ALPHABET[indice_plain]);
+    fread(entree, 1, taille, f);
+    entree[taille] = '\0';
+    fclose(f);
 
-        indice_cle = (indice_cle + 1) % longueur_cle;
-    }
+    // Déchiffrement
+    vigenereDec(entree, cle, sortie);
 
-    fclose(fichier_entree);
+    f = fopen(fichier, "w");
+    fwrite(sortie, 1, strlen(sortie), f);
+    fclose(f);
+
+    free(entree);
+    free(sortie);
+
+    printf("Déchiffrement terminé.\n");
     return 0;
 }
