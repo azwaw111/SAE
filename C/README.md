@@ -11,16 +11,9 @@
 Supposons `exemple.txt` :
 
 
-# Encodage en Base64
 base64 exemple.txt > exemple.b64
-
-# Encodage de la clé
 echo -n "CleSAE2025" | base64
-
-# Chiffrement
 ./cipher "<clé encodée en base64>" exemple.b64
-
-# Décodage après chiffrement
 base64 -d exemple.b64 > output.bin
 
 
@@ -30,39 +23,38 @@ Ceci constitue le **processus d'infection** d'un fichier.
 
 Supposons `exemple2.jpg` :
 
-
-# Encodage en Base64
 base64 exemple2.jpg > image.b64
-
-# Chiffrement
 ./cipher "<clé encodée en base64>" image.b64
-
-# Décodage après chiffrement
 base64 -d image.b64 > image_chiffree.bin
 
 
-Le processus est identique et s'applique à tout type de fichier.
+Le processus est identique pour tout type de fichier.
+
+### Exemple rapide 
+
+
+base64 exemple2.jpg > exemple.b
+./cipher Q2xlUFFMjAyNQ== exemple.b
+base64 -d exemple.b > out.bin
+base64 out.bin > out.v
+
+base64 exemple2.jpg > exemple.b
+./findkey exemple.b out.v
+
 
 ### Processus inverse : déchiffrement
 
 
-# Encodage de la clé d'origine
 echo -n "CleSAE2025" | base64
-
-# Déchiffrement
 ./decipher "<clé encodée en base64>" exemple.b64
-
-# Décodage du résultatase64 -d exemple.b64 > output.txt
-
+base64 -d exemple.b64 > output.txt
 
 Nous recommandons d'utiliser `cat` pour afficher le contenu des fichiers générés.
 
 ### Utilisation de findkey
 
-Le principe est identique :
-
-
 ./findkey clair.b64 chiffre.b64
+
 
 
 La clé est affichée sur **stdout** et sa taille sur **stderr**.
@@ -203,22 +195,9 @@ La bibliothèque statique `libcrypto.a` est générée automatiquement.
 
 
 
-## 6. Choix d’implémentation
-
-Quelques décisions importantes :
-
-* Lecture en deux passes dans `cipher.c` pour déterminer la taille du fichier.
-* Nettoyage systématique de la clé Base64.
-* Ignorer les caractères non pertinents (`\n`, `\r`, `\t`)par sécurité.
-* Construction d’une clé inverse pour le déchiffrement.
-* Tableau de taille fixe dans `findkey` (suffisant pour les besoins du projet).
 
 
-##
-
-
-
-## 8. Conclusion
+## 6. Conclusion
 
 Ce projet permet de manipuler des fichiers, des algorithmes simples de chiffrement, des buffers mémoire et un Makefile complet. Il constitue une base solide pour intégrer ultérieurement ces fonctionnalités dans des programmes plus complexes.
 
