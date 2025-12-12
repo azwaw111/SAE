@@ -2,7 +2,7 @@
 
 ## Langage C — Compétence C2
 
----
+
 
 ## Guide d'utilisation
 
@@ -10,7 +10,7 @@
 
 Supposons `exemple.txt` :
 
-```
+
 # Encodage en Base64
 base64 exemple.txt > exemple.b64
 
@@ -22,7 +22,7 @@ echo -n "CleSAE2025" | base64
 
 # Décodage après chiffrement
 base64 -d exemple.b64 > output.bin
-```
+
 
 Ceci constitue le **processus d'infection** d'un fichier.
 
@@ -30,7 +30,7 @@ Ceci constitue le **processus d'infection** d'un fichier.
 
 Supposons `exemple2.jpg` :
 
-```
+
 # Encodage en Base64
 base64 exemple2.jpg > image.b64
 
@@ -39,13 +39,13 @@ base64 exemple2.jpg > image.b64
 
 # Décodage après chiffrement
 base64 -d image.b64 > image_chiffree.bin
-```
+
 
 Le processus est identique et s'applique à tout type de fichier.
 
 ### Processus inverse : déchiffrement
 
-```
+
 # Encodage de la clé d'origine
 echo -n "CleSAE2025" | base64
 
@@ -53,7 +53,7 @@ echo -n "CleSAE2025" | base64
 ./decipher "<clé encodée en base64>" exemple.b64
 
 # Décodage du résultatase64 -d exemple.b64 > output.txt
-```
+
 
 Nous recommandons d'utiliser `cat` pour afficher le contenu des fichiers générés.
 
@@ -61,13 +61,13 @@ Nous recommandons d'utiliser `cat` pour afficher le contenu des fichiers génér
 
 Le principe est identique :
 
-```
+
 ./findkey clair.b64 chiffre.b64
-```
+
 
 La clé est affichée sur **stdout** et sa taille sur **stderr**.
 
----
+
 
 ## 1. Introduction
 
@@ -80,7 +80,7 @@ Ce projet consiste à développer trois outils en langage C permettant :
 Le chiffrement repose sur une variante du chiffre de **Vigenère mod 64**, appliqué sur l’alphabet Base64.
 Une bibliothèque statique (`libcrypto.a`) regroupe les fonctions communes afin de faciliter leur réutilisation.
 
----
+
 
 ## 2. Contexte et principe du chiffrement
 
@@ -92,13 +92,13 @@ Le processus complet de chiffrement utilisé dans le sujet est le suivant :
 
 L’alphabet utilisé est :
 
-```
+
 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
-```
+
 
 Les caractères `=` (padding Base64) ne doivent **pas** être modifiés.
 
----
+
 
 ## 3. Architecture du projet
 
@@ -124,7 +124,7 @@ La bibliothèque `libcrypto.a` contient les fonctions :
 
 Elle est générée automatiquement par le Makefile.
 
----
+
 
 ## 4. Fonctionnement des programmes
 
@@ -132,9 +132,9 @@ Elle est générée automatiquement par le Makefile.
 
 **Commande :**
 
-```
+
 ./cipher <cle_base64> <fichier_base64>
-```
+
 
 **Fonctionnement :**
 
@@ -145,51 +145,51 @@ Elle est générée automatiquement par le Makefile.
 
 Les caractères `=`, `\n`, `\r`, `\t` sont ignorés ou recopiés tels quels.
 
----
+
 
 ### 4.2. Programme `decipher`
 
 **Commande :**
 
-```
+
 ./decipher <cle_base64> <fichier_base64>
-```
+
 
 **Fonctionnement :**
 
 * Construction d’une **clé inverse** :
 
-  ```
+  
   K' = (64 - K) mod 64
-  ```
+  
 * Réutilisation de la fonction de chiffrement avec cette clé inverse.
 * Réécriture du fichier avec le texte déchiffré.
 
----
+
 
 ### 4.3. Programme `findkey`
 
 **Commande :**
 
-```
+
 ./findkey <clair_base64> <chiffre_base64>
-```
+
 
 **Fonctionnement :**
 
 1. Lecture simultanée des deux fichiers.
 2. Calcul du décalage pour chaque caractère :
 
-   ```
+   
    diff = (C - P + 64) mod 64
-   ```
+   
 3. Détermination de la période de la clé.
 4. Affichage :
 
    * clé → **stdout**
    * taille → **stderr**
 
----
+
 
 ## 5. Compilation
 
@@ -201,7 +201,7 @@ Le projet utilise un Makefile permettant :
 
 La bibliothèque statique `libcrypto.a` est générée automatiquement.
 
----
+
 
 ## 6. Choix d’implémentation
 
@@ -213,17 +213,16 @@ Quelques décisions importantes :
 * Construction d’une clé inverse pour le déchiffrement.
 * Tableau de taille fixe dans `findkey` (suffisant pour les besoins du projet).
 
----
 
 ##
 
----
+
 
 ## 8. Conclusion
 
 Ce projet permet de manipuler des fichiers, des algorithmes simples de chiffrement, des buffers mémoire et un Makefile complet. Il constitue une base solide pour intégrer ultérieurement ces fonctionnalités dans des programmes plus complexes.
 
----
+
 
 ## Documentation
 
@@ -252,4 +251,3 @@ Reportez-vous à la section **Guide d'utilisation** en début de document pour l
 
 Nous recommandons fortement d’utiliser `cat` pour afficher le contenu généré par les commandes (`clair.b64`, `image.b64`, fichiers décodés, etc.).
 
-\
