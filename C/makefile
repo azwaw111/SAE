@@ -1,5 +1,4 @@
 CC = gcc
-CFLAGS = -Wall -Wextra
 
 PROG = cipher decipher findkey
 
