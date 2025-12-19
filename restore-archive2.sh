@@ -129,8 +129,8 @@ if [ "$KEY_TYPE" = "s" ]; then
     echo "[*] Clé stockée dans $ARCHIVES_FILE"
 else
     keyDir="$TOOLBOX/${ARCHIVE_NAME%.tar.gz}"
-    mkdir -p "$keydir"   
- ./findkey "$TMP/clair.b64" "$TMP/chiffre.b64" -o "$keyDir/KEY" || exit 3
+    mkdir -p "$keyDir"   
+    ./findkey "$TMP/clair.b64" "$TMP/chiffre.b64" -o "$keyDir/KEY" || exit 3
     echo "$ARCHIVE_NAME:$dateRestore::f" >> "$ARCHIVES_FILE" || exit 3
     echo "[*] Clé stockée dans $keyDir/KEY"
 fi
