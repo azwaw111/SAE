@@ -1,6 +1,6 @@
-check-archive.sh                                                                                                                                                                                                                                                                                                      
 #!/bin/bash
 
+# --- Variables du 2ème script ---
 DOSSIER_TOOLBOX=".sh-toolbox"
 FICHIER_INVENTAIRE="$DOSSIER_TOOLBOX/archives"
 DOSSIER_TEMPORAIRE="/tmp/analyse-toolbox"
@@ -11,28 +11,23 @@ DOSSIER_DONNEES_RELATIF="data"
 FICHIERS_MODIFIES=()
 FICHIERS_EPARGNES=()
 
-echo "=== Vérification de l’environnement ==="
+# 1. Vérification de l’environnement
 if [ ! -d "$DOSSIER_TOOLBOX" ]; then
     echo "Erreur (1) : Dossier $DOSSIER_TOOLBOX manquant."
     exit 1
 fi
-
-
 
 if [ ! -f "$FICHIER_INVENTAIRE" ]; then
     echo "Erreur (2) : Fichier d’inventaire absent."
     exit 2
 fi
 
-echo ""
-echo "=== Sélection de l’archive ==="
-echo "Archives disponibles :"
+# 2. Sélection de l’archive (Style Script 1)
+echo "=== Archives disponibles ==="
+ls "$DOSSIER_TOOLBOX" | grep ".tar.gz"
+echo "Choisissez une archive à vérifier : "
+read ARCHIVE_CHOISIE
 
-for fichier in "$DOSSIER_TOOLBOX"/*.tar.gz; do
-    [ -e "$fichier" ] && echo "  - $(basename "$fichier")"
-done
-
-read -p "Nom exact de l’archive à analyser : " ARCHIVE_CHOISIE
 CHEMIN_ARCHIVE="$DOSSIER_TOOLBOX/$ARCHIVE_CHOISIE"
 
 if [ ! -f "$CHEMIN_ARCHIVE" ]; then
@@ -40,8 +35,7 @@ if [ ! -f "$CHEMIN_ARCHIVE" ]; then
     exit 2
 fi
 
-echo ""
-echo "=== Décompression de l’archive ==="
+# 3. Décompression
 rm -rf "$DOSSIER_TEMPORAIRE"
 mkdir -p "$DOSSIER_TEMPORAIRE"
 
@@ -50,10 +44,7 @@ if ! tar -xzf "$CHEMIN_ARCHIVE" -C "$DOSSIER_TEMPORAIRE"; then
     exit 3
 fi
 
-echo "Décompression réussie."
-
-echo ""
-echo "=== Analyse des journaux ==="
+# 4. Analyse des journaux
 CHEMIN_LOG="$DOSSIER_TEMPORAIRE/$DOSSIER_LOGS_RELATIF"
 
 if [ ! -f "$CHEMIN_LOG" ]; then
@@ -70,18 +61,13 @@ if [ -z "$DERNIERE_CONNEXION_ADMIN" ]; then
     exit 4
 fi
 
-echo "Dernière connexion admin :"
-echo "$DERNIERE_CONNEXION_ADMIN"
-
 ANNEE_COURANTE=$(date +%Y)
 DATE_CONNEXION=$(echo "$DERNIERE_CONNEXION_ADMIN" | awk -v annee="$ANNEE_COURANTE" '{print $1" "$2" "annee" "$3}')
 TIMESTAMP_INTRUSION=$(date -d "$DATE_CONNEXION" +%s)
 
-echo "Intrusion estimée : $DATE_CONNEXION"
-echo "Référence timestamp : $TIMESTAMP_INTRUSION"
+echo "Dernière connexion admin : $DATE_CONNEXION"
 
-echo ""
-echo "=== Classification des fichiers ==="
+# 5. Classification des fichiers (Logique Script 2)
 CHEMIN_DONNEES="$DOSSIER_TEMPORAIRE/$DOSSIER_DONNEES_RELATIF"
 
 if [ ! -d "$CHEMIN_DONNEES" ] || [ -z "$(ls -A "$CHEMIN_DONNEES")" ]; then
@@ -93,62 +79,65 @@ fi
 while read -r FICHIER; do
     TIMESTAMP_FICHIER=$(date -r "$FICHIER" +%s)
 
-    if [ "$TIMESTAMP_FICHIER" -gt "$TIMESTAMP_INTRUSION" ]; then
+    if [ "$TIMESTAMP_FICHIER" -ge "$TIMESTAMP_INTRUSION" ]; then
         FICHIERS_MODIFIES+=("$FICHIER")
     else
         PROPRIETAIRE=$(stat -c %U "$FICHIER")
         DROITS_SYMBOLIQUES=$(stat -c %A "$FICHIER")
 
-        if [ "$PROPRIETAIRE" != "admin" ] && ! echo "$DROITS_SYMBOLIQUES" | grep -q 'w'; then
+        # Vérifie que le propriétaire n'est pas admin et pas d'écriture groupe/autres
+        if [ "$PROPRIETAIRE" != "admin" ] && \
+           [[ "${DROITS_SYMBOLIQUES:5:1}" != "w" && "${DROITS_SYMBOLIQUES:8:1}" != "w" ]]; then
             FICHIERS_EPARGNES+=("$FICHIER")
         fi
     fi
 done < <(find "$CHEMIN_DONNEES" -type f)
 
+# 6. Affichage des fichiers modifiés (Style Script 1 : ls -ls)
 echo ""
-echo "▶ Fichiers modifiés :"
-if [ ${#FICHIERS_MODIFIES[@]} -eq 0 ]; then
-    echo "  Aucun fichier modifié."
+echo "=== Fichiers modifiés (ls -ls) ==="
+if [ "${#FICHIERS_MODIFIES[@]}" -eq 0 ]; then
+    echo "Aucun fichier modifié trouvé."
 else
     for f in "${FICHIERS_MODIFIES[@]}"; do
-        echo "  [MODIFIÉ] ${f#$DOSSIER_TEMPORAIRE/}"µ
-        ls -l "$f"
+        ls -ls "$f"
     done
 fi
 
+# 7. Recherche de duplicatas (Votre bloc d'affichage spécifique)
 echo ""
-echo "▶ Fichiers épargnés :"
-if [ ${#FICHIERS_EPARGNES[@]} -eq 0 ]; then
-    echo "  Aucun fichier épargné."
-else
-    for f in "${FICHIERS_EPARGNES[@]}"; do
-        echo "  [ÉPARGNÉ] ${f#$DOSSIER_TEMPORAIRE/}"
-    done
-fi
-
-echo ""
-echo "=== Recherche de duplicatas intacts ==="
+echo "=== Recherche de duplicatas (clair / chiffré) ==="
 trouve=0
+
 for fichier_modifie in "${FICHIERS_MODIFIES[@]}"; do
     nom_modifie=$(basename "$fichier_modifie")
     taille_modifie=$(stat -c %s "$fichier_modifie")
+    date_modifie=$(stat -c %y "$fichier_modifie")
 
     for fichier_epargne in "${FICHIERS_EPARGNES[@]}"; do
         nom_epargne=$(basename "$fichier_epargne")
         taille_epargne=$(stat -c %s "$fichier_epargne")
 
         if [ "$nom_modifie" = "$nom_epargne" ] && [ "$taille_modifie" -eq "$taille_epargne" ]; then
-            echo "  [ORIGINAL] $nom_epargne ($taille_epargne octets)"
+
+            echo "---------------------------------------------"
+            echo "[CHIFFRÉ]"
+            echo "  Chemin : ${fichier_modifie#$DOSSIER_TEMPORAIRE/}"
+            echo "  Taille : $taille_modifie octets"
+            echo "  Modifié: $date_modifie"
+            echo ""
+            echo "[CLAIR]"
+            echo "  Chemin : ${fichier_epargne#$DOSSIER_TEMPORAIRE/}"
+            echo "  Taille : $taille_epargne octets"
+            echo "---------------------------------------------"
+            echo ""
+
             trouve=1
         fi
     done
 done
 
-[ "$trouve" -eq 0 ] && echo "  Aucun duplicata trouvé."
+[ "$trouve" -eq 0 ] && echo "Aucun duplicata trouvé."
 
-echo ""
-echo "=== Nettoyage ==="
-rm -rf "$DOSSIER_TEMPORAIRE"
 echo "Analyse terminée."
-
 exit 0
