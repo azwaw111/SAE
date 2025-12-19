@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# --- Variables du 2ème script ---
+# Variables : 
 DOSSIER_TOOLBOX=".sh-toolbox"
 FICHIER_INVENTAIRE="$DOSSIER_TOOLBOX/archives"
 DOSSIER_TEMPORAIRE="/tmp/analyse-toolbox"
@@ -22,7 +22,7 @@ if [ ! -f "$FICHIER_INVENTAIRE" ]; then
     exit 2
 fi
 
-# 2. Sélection de l’archive (Style Script 1)
+# 2. Sélection de l’archive 
 echo "=== Archives disponibles ==="
 ls "$DOSSIER_TOOLBOX" | grep ".tar.gz"
 echo "Choisissez une archive à vérifier : "
@@ -93,7 +93,7 @@ while read -r FICHIER; do
     fi
 done < <(find "$CHEMIN_DONNEES" -type f)
 
-# 6. Affichage des fichiers modifiés (Style Script 1 : ls -ls)
+# 6. Affichage des fichiers modifiés :
 echo ""
 echo "=== Fichiers modifiés (ls -ls) ==="
 if [ "${#FICHIERS_MODIFIES[@]}" -eq 0 ]; then
@@ -104,7 +104,7 @@ else
     done
 fi
 
-# 7. Recherche de duplicatas (Votre bloc d'affichage spécifique)
+# 7. Recherche de duplicatas :
 echo ""
 echo "=== Recherche de duplicatas (clair / chiffré) ==="
 trouve=0
