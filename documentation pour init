@@ -1,0 +1,58 @@
+Documentation complète du script init-toolbox.sh
+Titre : Documentation du script init-toolbox.sh
+
+Le script init-toolbox.sh constitue la première étape d’initialisation de l’environnement de travail de la SAE. Il assure deux fonctions essentielles :
+
+    Vérifier et compiler automatiquement les binaires nécessaires (decipher et findkey)
+
+    Initialiser le dossier .sh-toolbox conformément aux exigences du sujet
+
+Cette documentation présente de manière détaillée et académique le fonctionnement complet du script.
+
+    Vérification et compilation des binaires
+
+Avant toute initialisation, le script commence par s’assurer que les programmes indispensables au fonctionnement de la toolbox sont présents. Les binaires concernés sont : decipher et findkey. Ces programmes doivent être disponibles à la racine du projet et être exécutables.
+
+Le script parcourt les deux binaires à l’aide d’une boucle. Pour chacun, il vérifie s’il existe et s’il est exécutable. Si ce n’est pas le cas, une procédure de compilation est déclenchée.
+
+    Gestion des erreurs imposées par l’énoncé
+
+Avant de compiler, le script effectue deux vérifications obligatoires afin de respecter les codes d’erreur définis dans le sujet.
+
+• Erreur 10 : fichier source manquant Le script vérifie que le fichier source correspondant (src/decipher.c ou src/findkey.c) existe. S’il est absent, le script s’arrête immédiatement avec le code d’erreur 10.
+
+• Erreur 11 : compilateur GCC absent Le script vérifie ensuite que le compilateur GCC est disponible sur la machine. S’il ne l’est pas, la compilation est impossible et le script renvoie le code d’erreur 11.
+
+    Compilation automatique des binaires
+
+Une fois les vérifications préliminaires effectuées, le script tente de compiler le binaire manquant. Deux méthodes sont possibles selon la présence d’un Makefile.
+
+• Compilation via Makefile Si un fichier Makefile est présent dans le dossier src/, le script utilise la commande make pour compiler le binaire. Si le binaire est généré dans src/, il est ensuite déplacé à la racine du projet.
+
+• Compilation manuelle Si aucun Makefile n’est disponible, le script compile manuellement le programme à l’aide de GCC. La commande inclut également le fichier src/crypto.c, car certaines fonctions utilisées dans decipher.c et findkey.c y sont définies. Cette inclusion est indispensable pour éviter les erreurs de type “undefined reference”.
+
+    Erreur 12 : compilation échouée
+
+Après la compilation, le script vérifie si celle-ci a réussi. Si la compilation échoue (erreur de syntaxe, fonction manquante, etc.), le script renvoie le code d’erreur 12, conformément aux exigences du sujet.
+
+    Initialisation du dossier .sh-toolbox
+
+Une fois les binaires validés, le script procède à l’initialisation du dossier de travail.
+
+• Création du dossier .sh-toolbox Si le dossier n’existe pas, il est créé. En cas d’échec, le script renvoie le code d’erreur 1.
+
+• Création du fichier archives Si le fichier .sh-toolbox/archives n’existe pas, il est créé et initialisé avec la valeur 0. Ce fichier contient le nombre d’archives présentes dans la toolbox.
+
+• Vérification du contenu du dossier Le script vérifie que le dossier .sh-toolbox ne contient que le fichier archives. Si un autre élément est présent, le script renvoie l’erreur 2.
+
+    Fin du script
+
+Si toutes les étapes se déroulent correctement, le script affiche “Initialisation réussie” et se termine avec le code 0, indiquant que l’environnement est prêt à être utilisé.
+
+    Conclusion
+
+Le script init-toolbox.sh joue un rôle essentiel dans la mise en place de l’environnement de travail de la SAE. Il garantit :
+
+• la présence et la validité des binaires nécessaires • la compilation automatique en cas d’absence • la gestion stricte des erreurs imposées par l’énoncé • la création et la vérification du dossier .sh-toolbox
+
+Il constitue ainsi une étape indispensable au bon fonctionnement de l’ensemble des scripts du projet.
