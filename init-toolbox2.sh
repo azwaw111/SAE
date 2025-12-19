@@ -1,8 +1,6 @@
 #!/bin/bash
 
-###############################################
 # Vérification et compilation des binaires
-###############################################
 
 # Liste des binaires à vérifier
 for bin in decipher findkey; do
@@ -53,9 +51,7 @@ for bin in decipher findkey; do
 
 done
 
-###############################################
 # PARTIE ORIGINALE — NON MODIFIÉE
-###############################################
 
 # Vérifier si le dossier existe
 if [ ! -d ".sh-toolbox" ]; then
