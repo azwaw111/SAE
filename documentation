@@ -1,0 +1,193 @@
+# Projet : Intégration d’une boîte à outils post-attaque  
+## SAE3 — Bash & Langage C  
+### Compétences C2 & C3
+
+---
+
+## 1. Description générale du projet
+
+Ce projet correspond à la **troisième SAE**, dont l’objectif est d’**intégrer** les outils développés lors des SAE précédentes :
+
+- scripts **Bash** de gestion et d’analyse d’archives (SAE1 – C3),
+- programmes en **langage C** dédiés au chiffrement, déchiffrement et à la recherche de clés (SAE2 – C2).
+
+L’ensemble forme une **boîte à outils cohérente** permettant l’analyse post-compromission d’un système, la gestion des preuves numériques et la restauration de fichiers chiffrés à partir d’archives `.tar.gz`.
+
+---
+
+## 2. Statut du projet et technologies utilisées
+
+**Statut :** En développement / fonctionnel  
+**Cadre :** SAE – Situation d’Apprentissage et d’Évaluation
+
+### Technologies
+- Bash
+- Langage C
+- GCC / Make
+- Outils Linux standards : `tar`, `grep`, `awk`, `sed`, `stat`, `date`, `base64`
+
+---
+
+## 3. Concepts fondamentaux
+
+### 3.1 Dossier de travail : `.sh-toolbox`
+
+Le dossier caché `.sh-toolbox` centralise :
+- les archives importées,
+- le fichier d’inventaire `archives`,
+- les fichiers de clés lorsque celles-ci ne sont pas stockées directement.
+
+### 3.2 Fichier d’inventaire : `.sh-toolbox/archives`
+
+Le fichier `archives` sert de **registre de preuves**.
+
+Structure :
+```text
+nom_archive:date:cle:type
+type = s : clé stockée directement dans le fichier
+
+type = f : clé stockée dans un fichier externe
+
+4. Architecture du projet
+.
+├── .sh-toolbox
+│   ├── archives
+│   ├── client1-xxxx.tar.gz
+│   └── client2-xxxx.tar.gz
+├── init-toolbox.sh
+├── import-archive.sh
+├── ls-toolbox.sh
+├── check-archive.sh
+├── restore-toolbox.sh
+├── restore-archive.sh
+├── decipher
+├── findkey
+└── src
+    ├── decipher.c
+    ├── findkey.c
+    ├── crypto.c
+    └── Makefile
+
+5. Initialisation de l’environnement
+
+Commande à exécuter une seule fois :
+
+./init-toolbox.sh
+
+
+Fonctionnalités :
+
+création de .sh-toolbox et du fichier archives,
+
+vérification de la présence des binaires decipher et findkey,
+
+compilation automatique si nécessaire.
+
+Codes de retour :
+
+10 : fichiers sources absents
+
+11 : compilateur indisponible
+
+12 : échec de la compilation
+
+6. Présentation des outils intégrés
+6.1 check-archive.sh — Analyse d’impact
+
+Analyse une archive afin d’identifier :
+
+les fichiers modifiés après une intrusion,
+
+les fichiers épargnés,
+
+les couples clair / chiffré (nom et taille identiques).
+
+Méthode :
+
+analyse de var/log/auth.log,
+
+récupération de la dernière connexion de l’utilisateur admin,
+
+comparaison avec les dates de modification (mtime).
+
+6.2 findkey — Recherche de clé (Langage C)
+
+Commande :
+
+./findkey clair.b64 chiffre.b64 [-o fichier]
+
+
+Fonctionnalités :
+
+déduction automatique de la clé Vigenère mod 64,
+
+prise en charge des clés binaires non imprimables,
+
+sortie :
+
+clé sur stdout ou dans un fichier (-o),
+
+taille de la clé sur stderr.
+
+6.3 restore-archive.sh — Restauration des fichiers
+
+Ce script assure l’intégration complète Bash / C.
+
+Fonctionnalités :
+
+sélection interactive de l’archive,
+
+détection des fichiers chiffrés,
+
+appel au programme findkey,
+
+stockage de la clé :
+
+dans archives (s),
+
+ou dans un fichier KEY (f),
+
+appel au programme decipher,
+
+restauration avec conservation de l’arborescence,
+
+confirmation utilisateur en cas d’écrasement.
+
+Codes de retour :
+
+0 : succès
+
+1 : dossier .sh-toolbox absent
+
+2 : erreur création dossier destination
+
+3 : échec mise à jour du fichier archives
+
+4 : restauration incomplète
+
+7. Intégration Bash / C — Compétences C2 & C3
+
+Cette SAE met en évidence :
+
+l’appel de binaires C depuis des scripts Bash,
+
+la gestion des flux stdout / stderr,
+
+la manipulation de fichiers binaires,
+
+la robustesse via les codes de retour.
+
+Les programmes C sont intégrés dans un flux automatisé d’analyse et de restauration.
+
+8. Limites connues
+
+L’année utilisée pour l’analyse de auth.log correspond à l’année courante.
+
+Seules les archives .tar.gz sont prises en charge.
+
+Une clé incorrecte peut empêcher la restauration complète.
+
+9. Conclusion
+
+Cette SAE3 constitue une synthèse des compétences acquises en scripting et en développement C.
+Elle aboutit à une boîte à outils cohérente, fonctionnelle et extensible.
