@@ -1,4 +1,4 @@
-#!/bin/bash
+ #!/bin/bash
 # ==============================
 # Configuration
 # ==============================
@@ -164,8 +164,7 @@ while read -r f; do
     # Si le propriétaire n'est pas "admin" et que le fichier est protégé en écriture pour groupe/autres, on l'épargne
     if [ "$PROPRIETAIRE" != "admin" ] && \
        [[ "${DROITS_SYMBOLIQUES:5:1}" != "w" && "${DROITS_SYMBOLIQUES:8:1}" != "w" ]]; then
-        echo "[*] Fichier épargné (propriétaire non admin ou pas d'écriture groupe/autres) : $f"
-        continue  # Passe au fichier suivant sans restauration
+        echo "[*] copier quand meme:fichier épargné (propriétaire non admin ou pas d'écriture groupe/autres) : $f"
     fi
     
     # Vérification si fichier existant
