@@ -1,12 +1,11 @@
 # Projet : Intégration d’une boîte à outils post-attaque  
-## SAE3 — Bash & Langage C  
+
 ### Compétences C2 & C3
 
----
 
 ## 1. Description générale du projet
 
-Ce projet correspond à la **troisième SAE**, dont l’objectif est d’**intégrer** les outils développés lors des SAE précédentes :
+Ce projet correspond à la **troisième SAE**, dont l’objectif est d’intégrer les outils développés lors des SAE précédentes :
 
 - scripts **Bash** de gestion et d’analyse d’archives (SAE1 – C3),
 - programmes en **langage C** dédiés au chiffrement, déchiffrement et à la recherche de clés (SAE2 – C2).
