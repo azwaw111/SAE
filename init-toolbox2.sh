@@ -51,7 +51,7 @@ for bin in decipher findkey; do
 
 done
 
-# PARTIE ORIGINALE — NON MODIFIÉE
+# PARTIE ORIGINALE
 
 # Vérifier si le dossier existe
 if [ ! -d ".sh-toolbox" ]; then
