@@ -1,0 +1,249 @@
+
+# Guide d'utilisation des scripts Bash – SAE3
+
+Ce document présente l’ensemble des scripts Bash fournis dans la boîte à outils post‑attaque.  
+ls permettent d’importer, analyser et restaurer des archives `.tar.gz` contenant des fichiers chiffrés.
+
+
+
+## 1. Architecture du projet
+
+L’arborescence générale du projet est la suivante :
+
+.
+├── .sh-toolbox
+│   ├── archives
+│   ├── client1-xxxx.tar.gz
+│   ├── client2-xxxx.tar.gz
+│   └── KEY                (si la clé est stockée dans un fichier)
+│
+├── init-toolbox.sh
+├── import-archive.sh
+├── ls-toolbox.sh
+├── check-archive.sh
+├── restore-toolbox.sh
+├── restore-archive.sh
+│
+├── decipher              (binaire compilé)
+├── findkey               (binaire compilé)
+│
+└── src
+    ├── decipher.c
+    ├── findkey.c
+    ├── crypto.c
+    ├── crypto.h
+    ├── Makefile
+    └── libcrypto/
+
+
+
+
+## 2. init-toolbox.sh — Initialisation de l’environnement
+
+### Commande :
+
+./init-toolbox.sh
+
+
+### Fonctionnalités :
+- création du dossier `.sh-toolbox`,
+- création du fichier `.sh-toolbox/archives`,
+- vérification de la présence des binaires `decipher` et `findkey`,
+- compilation automatique si nécessaire (Makefile ou GCC).
+
+### Codes de retour :
+- **10** : fichiers sources absents  
+- **11** : compilateur indisponible  
+- **12** : échec de la compilation  
+
+
+
+## 3. import-archive.sh — Importation d’une archive
+
+### Commande :
+
+./import-archive.sh fichier.tar.gz
+
+
+### Fonction :
+- copie l’archive dans `.sh-toolbox`,
+- met à jour le fichier `archives`,
+- vérifie la validité du format `.tar.gz`.
+
+
+
+## 4. ls-toolbox.sh — Liste des archives disponibles
+
+### Commande :
+
+./ls-toolbox.sh
+
+
+Affiche toutes les archives présentes dans `.sh-toolbox`.
+
+
+
+## 5. check-archive.sh — Analyse d’impact
+
+### Commande :
+
+./check-archive.sh
+
+
+### Fonctionnalités :
+- sélection d’une archive,
+- extraction temporaire,
+- analyse de `/var/log/auth.log`,
+- récupération de la dernière connexion réussie de `admin`,
+- conversion en timestamp Unix,
+- classification des fichiers.
+
+#### Fichiers modifiés :
+- `mtime` ≥ timestamp de l’intrusion  
+→ potentiellement chiffrés ou compromis.
+
+#### Fichiers épargnés :
+- antérieurs à l’intrusion,
+- non modifiables par le groupe ou les autres utilisateurs,
+- propriétaire différent de `admin`.
+
+
+## 6. restore-archive.sh — Restauration d’une archive
+
+### Commande :
+
+./restore-archive.sh
+
+
+### Fonctionnalités :
+- sélection interactive de l’archive,
+- détection des fichiers chiffrés,
+- appel au programme `findkey`,
+- stockage de la clé :
+  - dans `archives` (type `s`),
+  - ou dans un fichier `KEY` (type `f`),
+- appel au programme `decipher`,
+- restauration complète de l’arborescence,
+- confirmation en cas d’écrasement.
+
+### Codes de retour :
+- **0** : succès  
+- **1** : dossier `.sh-toolbox` absent  
+- **2** : erreur création dossier destination  
+- **3** : échec mise à jour du fichier `archives`  
+- **4** : restauration incomplète  
+
+
+
+## 7. restore-toolbox.sh — Restauration globale
+
+Permet de restaurer toutes les archives présentes dans `.sh-toolbox`.
+
+
+
+## 8. Conclusion
+
+Ces scripts constituent une chaîne complète d’analyse et de restauration post‑attaque, intégrant les programmes C de déchiffrement et de recherche de clé.
+
+
+# Guide d'utilisation des programmes C – SAE3
+
+Ce document décrit les programmes C utilisés par les scripts Bash de la boîte à outils.  
+Ils permettent la recherche de clé et le déchiffrement de fichiers chiffrés en Base64.
+
+
+
+## 1. Architecture du dossier `src/`
+
+
+src/
+├── decipher.c
+├── findkey.c
+├── crypto.c
+├── crypto.h
+├── Makefile
+└── libcrypto/      
+
+
+Les binaires générés (`decipher` et `findkey`) sont placés à la racine du projet.
+
+
+
+## 2. Compilation
+
+### Avec Makefile :
+
+cd src
+make
+
+
+Génère les binaires `decipher` et `findkey`.
+
+### Sans Makefile :
+
+gcc decipher.c crypto.c -o decipher
+gcc findkey.c crypto.c -o findkey
+
+
+
+
+## 3. Programme `findkey` — Recherche de clé
+
+### Commande :
+
+./findkey clair.b64 chiffre.b64 [-o fichier]
+
+
+### Fonction :
+Déduit automatiquement la clé Vigenère mod 64 utilisée pour chiffrer un fichier.
+
+### Entrées :
+- `clair.b64` : version en Base64 du fichier original,
+- `chiffre.b64` : version chiffrée en Base64.
+
+### Sorties :
+- clé affichée sur **stdout**,
+- taille de la clé affichée sur **stderr**,
+- possibilité d’écrire la clé dans un fichier via l’option `-o`.
+
+### Particularités :
+- gère les clés binaires non imprimables,
+- fonctionne sur des fichiers de tailles identiques.
+
+
+
+## 4. Programme `decipher` — Déchiffrement
+
+### Commande :
+
+./decipher fichier_chiffre.b64 cle [-o fichier_sortie]
+```
+
+### Fonction :
+Déchiffre un fichier chiffré en Base64 à l’aide d’une clé Vigenère mod 64.
+
+### Entrées :
+- fichier chiffré en Base64,
+- clé (chaîne ou contenu binaire),
+- option `-o` pour définir le fichier de sortie.
+
+### Sortie :
+- fichier déchiffré en clair.
+
+---
+
+## 5. Bibliothèque `crypto.c`
+
+Le fichier `crypto.c` (associé à `crypto.h`) contient les fonctions cryptographiques utilisées par les deux programmes :
+
+- gestion de l’alphabet Base64,
+- calcul des indices,
+- opérations Vigenère mod 64,
+- fonctions utilitaires communes.
+
+---
+
+## 6. Conclusion
+
+Les programmes C constituent le cœur cryptographique de la boîte à outils.  
+Ils sont conçus pour être appelés automatiquement par les scripts Bash, garantissant une intégration fluide et une automatisation complète du processus de restauration.
