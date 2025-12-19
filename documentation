@@ -10,9 +10,6 @@ Ce projet correspond à la **troisième SAE**, dont l’objectif est d’intégr
 - scripts **Bash** de gestion et d’analyse d’archives (SAE1 – C3),
 - programmes en **langage C** dédiés au chiffrement, déchiffrement et à la recherche de clés (SAE2 – C2).
 
-L’ensemble forme une **boîte à outils cohérente** permettant l’analyse post-compromission d’un système, la gestion des preuves numériques et la restauration de fichiers chiffrés à partir d’archives `.tar.gz`.
-
----
 
 ## 2. Statut du projet et technologies utilisées
 
@@ -25,7 +22,6 @@ L’ensemble forme une **boîte à outils cohérente** permettant l’analyse po
 - GCC / Make
 - Outils Linux standards : `tar`, `grep`, `awk`, `sed`, `stat`, `date`, `base64`
 
----
 
 ## 3. Concepts fondamentaux
 
@@ -41,10 +37,10 @@ Le dossier caché `.sh-toolbox` centralise :
 Le fichier `archives` sert de **registre de preuves**.
 
 Structure :
-```text
+compteur
 nom_archive:date:cle:type
-type = s : clé stockée directement dans le fichier
 
+type = s : clé stockée directement dans le fichier
 type = f : clé stockée dans un fichier externe
 
 4. Architecture du projet
@@ -53,6 +49,7 @@ type = f : clé stockée dans un fichier externe
 │   ├── archives
 │   ├── client1-xxxx.tar.gz
 │   └── client2-xxxx.tar.gz
+|       └── KEY
 ├── init-toolbox.sh
 ├── import-archive.sh
 ├── ls-toolbox.sh
@@ -66,6 +63,9 @@ type = f : clé stockée dans un fichier externe
     ├── findkey.c
     ├── crypto.c
     └── Makefile
+    └── libcrypto
+    └── crypto.h
+
 
 5. Initialisation de l’environnement
 
@@ -84,11 +84,11 @@ compilation automatique si nécessaire.
 
 Codes de retour :
 
-10 : fichiers sources absents
+0 : fichiers sources absents
 
-11 : compilateur indisponible
+1 : compilateur indisponible
 
-12 : échec de la compilation
+2 : échec de la compilation
 
 6. Présentation des outils intégrés
 6.1 check-archive.sh — Analyse d’impact
