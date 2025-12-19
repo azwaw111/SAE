@@ -84,11 +84,11 @@ compilation automatique si nécessaire.
 
 Codes de retour :
 
-0 : fichiers sources absents
+10 : fichiers sources absents
 
-1 : compilateur indisponible
+11 : compilateur indisponible
 
-2 : échec de la compilation
+12 : échec de la compilation
 
 6. Présentation des outils intégrés
 6.1 check-archive.sh — Analyse d’impact
@@ -105,7 +105,7 @@ Méthode :
 
 analyse de var/log/auth.log,
 
-récupération de la dernière connexion de l’utilisateur admin,
+récupération de la dernière connexion de l’utilisateur admin,( avec grep )
 
 comparaison avec les dates de modification (mtime).
 
