@@ -102,33 +102,45 @@ les fichiers épargnés,
 les couples clair / chiffré (nom et taille identiques).
 
 Méthode :
+Vérification de l’environnement
+Sélection et extraction de l’archive
+Analyse des journaux d’authentification
+Identifier la **dernière connexion réussie de l’utilisateur `admin`**.
+    -La date extraite est convertie en **timestamp Unix**, qui servira de référence temporelle pour déterminer le moment de l’intrusion.
+Tous les fichiers du dossier `data` sont analysés selon leur date de modification (`mtime`) :
 
-analyse de var/log/auth.log,
+- **Fichiers modifiés**  
+  Fichiers dont la date de modification est postérieure ou égale au timestamp de l’intrusion.  
+  Ces fichiers sont considérés comme potentiellement chiffrés ou compromis.
 
-récupération de la dernière connexion de l’utilisateur admin,( avec grep )
+- **Fichiers épargnés**  
+  Fichiers antérieurs à l’intrusion, dont :
+  - le propriétaire n’est pas `admin`,
+  - et qui ne sont pas modifiables par le groupe ou les autres utilisateurs.  
 
-comparaison avec les dates de modification (mtime).
+Cette règle permet d’identifier des fichiers restés intacts.
+
+Comment exécuter ? 
+On éxécute : ./check-archive.sh 
+Affiche la liste des archives disponibles dans .sh-toolbox, par exemple :
+client1-20250411-1311.tar.gz
+client2-20250411-1341.tar.g
+
+
 
 6.2 findkey — Recherche de clé (Langage C)
 
 Commande :
-
 ./findkey clair.b64 chiffre.b64 [-o fichier]
 
-
 Fonctionnalités :
-
 déduction automatique de la clé Vigenère mod 64,
-
 prise en charge des clés binaires non imprimables,
-
 sortie :
-
 clé sur stdout ou dans un fichier (-o),
-
 taille de la clé sur stderr.
 
-6.3 restore-archive.sh — Restauration des fichiers
+6.3 rstore-archive.sh — Restauration des fichieres
 
 Ce script assure l’intégration complète Bash / C.
 
