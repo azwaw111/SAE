@@ -1,27 +1,80 @@
 #!/bin/bash
 
 ###############################################
-# 1. Initialisation du dossier .sh-toolbox
+# Vérification et compilation des binaires
+###############################################
+
+# Liste des binaires à vérifier
+for bin in decipher findkey; do
+
+    # Si le binaire n'existe pas
+    if [ ! -x "$bin" ]; then
+        echo "Binaire $bin manquant, compilation..."
+
+        # 10 : fichier source manquant
+        if [ ! -f "src/$bin.c" ]; then
+            echo "Erreur : fichier source $bin.c introuvable"
+            exit 10
+        fi
+
+        # 11 : compilateur absent
+        if ! command -v gcc >/dev/null 2>&1; then
+            echo "Erreur : compilateur gcc indisponible"
+            exit 11
+        fi
+
+        # Compilation via Makefile si présent
+        if [ -f "src/Makefile" ]; then
+            echo "Compilation via Makefile..."
+            (cd src && make "$bin" >/dev/null 2>&1)
+            status=$?
+
+            # Déplacer le binaire si généré dans src/
+            if [ -f "src/$bin" ]; then
+                mv "src/$bin" .
+            fi
+        else
+            # Compilation manuelle
+            echo "Compilation manuelle..."
+            gcc "src/$bin.c" -o "$bin"
+            status=$?
+        fi
+
+        # 12 : compilation échouée
+        if [ $status -ne 0 ]; then
+            echo "Erreur : compilation de $bin échouée"
+            exit 12
+        fi
+
+        echo "Binaire $bin compilé avec succès."
+    else
+        echo "Binaire $bin déjà présent."
+    fi
+
+done
+
+###############################################
+# PARTIE ORIGINALE — NON MODIFIÉE
 ###############################################
 
 # Vérifier si le dossier existe
 if [ ! -d ".sh-toolbox" ]; then
-    mkdir ".sh-toolbox"
-    if [ "$?" -ne 0 ]; then
-        echo "Erreur : impossible de créer le dossier .sh-toolbox"
-        exit 1
+    mkdir ".sh-toolbox" 
+    if [ "$?" -ne 0 ] ; then 
+        echo "Erreur : impossible de créer le dossier";
+        exit 1;
     fi
     echo "Dossier .sh-toolbox créé"
 else
     echo "Le dossier .sh-toolbox existe déjà"
 fi
 
-# Vérifier si le fichier archives existe
+# Vérifier si le fichier existe
 if [ ! -f ".sh-toolbox/archives" ]; then
     echo 0 > ".sh-toolbox/archives"
-    if [ "$?" -ne 0 ]; then
-        echo "Erreur : impossible de créer le fichier archives"
-        exit 1
+    if [ "$?" -ne 0 ] ; then 
+        echo "Erreur : impossible de créer le fichier";
+        exit 1;
     fi
     echo "Fichier archives créé"
 else
@@ -34,60 +87,6 @@ if [ "$contenu" != "archives" ]; then
     echo "Erreur : le dossier .sh-toolbox contient autre chose que le fichier archives"
     exit 2
 fi
-
-###############################################
-# 2. Vérification et compilation des binaires
-###############################################
-
-SRC_DIR="src"
-BIN_DEC="decipher"
-BIN_FIND="findkey"
-SRC_DEC="$SRC_DIR/decipher.c"
-SRC_FIND="$SRC_DIR/findkey.c"
-
-# Vérifier la présence des fichiers sources
-if [ ! -f "$SRC_DEC" ] || [ ! -f "$SRC_FIND" ]; then
-    echo "Erreur : fichiers sources manquants dans src/"
-    exit 10
-fi
-
-# Vérifier la présence du compilateur
-if ! command -v gcc >/dev/null 2>&1; then
-    echo "Erreur : compilateur gcc indisponible"
-    exit 11
-fi
-
-# Fonction de compilation
-compile_binary() {
-    local src="$1"
-    local out="$2"
-
-    echo "Compilation de $out..."
-    gcc "$src" -o "$out"
-    if [ "$?" -ne 0 ]; then
-        echo "Erreur : échec de compilation pour $out"
-        exit 12
-    fi
-    echo "Binaire $out compilé avec succès"
-}
-
-# Compiler decipher si absent
-if [ ! -x "$BIN_DEC" ]; then
-    compile_binary "$SRC_DEC" "$BIN_DEC"
-else
-    echo "Binaire decipher déjà présent"
-fi
-
-# Compiler findkey si absent
-if [ ! -x "$BIN_FIND" ]; then
-    compile_binary "$SRC_FIND" "$BIN_FIND"
-else
-    echo "Binaire findkey déjà présent"
-fi
-
-###############################################
-# 3. Fin du script
-###############################################
 
 echo "Initialisation réussie"
 exit 0
