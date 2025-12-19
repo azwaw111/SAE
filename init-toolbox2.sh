@@ -34,7 +34,7 @@ for bin in decipher findkey; do
         else
             # Compilation manuelle
             echo "Compilation manuelle..."
-            gcc "src/$bin.c" -o "$bin"
+            gcc "src/$bin.c" "src/crypto.c" -o "$bin"
             status=$?
         fi
 
