@@ -1,5 +1,4 @@
-Documentation complète du script init-toolbox.sh
-Titre : Documentation du script init-toolbox.sh
+ Documentation du script init-toolbox.sh
 
 Le script init-toolbox.sh constitue la première étape d’initialisation de l’environnement de travail de la SAE. Il assure deux fonctions essentielles :
 
